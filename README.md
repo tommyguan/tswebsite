@@ -1,3 +1,5 @@
+ssh -i "awswebkey.pem" ec2-user@ec2-52-52-192-236.us-west-1.compute.amazonaws.com
+
 To start the site, sudo python3 run.py >tsweb.log 2>&1 &
 
 To kill the site, ps -aef|grep python3 , sudo kill -9 PID
