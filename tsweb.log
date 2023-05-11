@@ -1,0 +1,66 @@
+ * Serving Flask app 'apps' (lazy loading)
+ * Environment: production
+   WARNING: This is a development server. Do not use it in a production deployment.
+   Use a production WSGI server instead.
+ * Debug mode: off
+ * Running on all addresses.
+   WARNING: This is a development server. Do not use it in a production deployment.
+ * Running on https://172.31.31.117:443/ (Press CTRL+C to quit)
+148.87.23.13 - - [11/May/2023 00:29:57] "GET /index HTTP/1.1" 403 -
+148.87.23.4 - - [11/May/2023 00:29:58] "GET /static/assets/css/nucleo-svg.css HTTP/1.1" 200 -
+148.87.23.5 - - [11/May/2023 00:29:58] "GET /static/assets/css/soft-ui-dashboard.css?v=1.0.6 HTTP/1.1" 200 -
+148.87.23.11 - - [11/May/2023 00:29:58] "GET /static/assets/css/dark-theme-core.css HTTP/1.1" 200 -
+148.87.23.11 - - [11/May/2023 00:29:58] "GET /static/assets/css/nucleo-icons.css HTTP/1.1" 200 -
+148.87.23.4 - - [11/May/2023 00:29:58] "GET /static/assets/js/core/popper.min.js HTTP/1.1" 200 -
+148.87.23.4 - - [11/May/2023 00:29:58] "GET /static/assets/js/core/bootstrap.min.js HTTP/1.1" 200 -
+148.87.23.11 - - [11/May/2023 00:29:58] "GET /static/assets/js/plugins/perfect-scrollbar.min.js HTTP/1.1" 200 -
+148.87.23.11 - - [11/May/2023 00:29:58] "GET /static/assets/js/plugins/smooth-scrollbar.min.js HTTP/1.1" 200 -
+148.87.23.11 - - [11/May/2023 00:29:58] "GET /static/assets/js/soft-ui-dashboard.min.js?v=1.0.6 HTTP/1.1" 200 -
+148.87.23.4 - - [11/May/2023 00:29:58] "GET /static/assets/js/dark-mode-handler.js HTTP/1.1" 200 -
+148.87.23.4 - - [11/May/2023 00:29:58] "GET /static/assets/img/curved-images/curved6.jpg HTTP/1.1" 200 -
+148.87.23.9 - - [11/May/2023 00:29:59] "GET /static/assets/img/favicon.png HTTP/1.1" 200 -
+148.87.23.4 - - [11/May/2023 00:30:00] "GET / HTTP/1.1" 302 -
+148.87.23.4 - - [11/May/2023 00:30:00] "GET /login HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:01] "GET /static/assets/css/nucleo-svg.css HTTP/1.1" 304 -
+148.87.23.9 - - [11/May/2023 00:30:01] "GET /static/assets/css/soft-ui-dashboard.css?v=1.0.6 HTTP/1.1" 304 -
+148.87.23.11 - - [11/May/2023 00:30:01] "GET /static/assets/css/dark-theme-core.css HTTP/1.1" 304 -
+148.87.23.11 - - [11/May/2023 00:30:01] "GET /static/assets/css/nucleo-icons.css HTTP/1.1" 304 -
+148.87.23.4 - - [11/May/2023 00:30:01] "GET /static/assets/js/core/popper.min.js HTTP/1.1" 304 -
+148.87.23.9 - - [11/May/2023 00:30:01] "GET /static/assets/js/core/bootstrap.min.js HTTP/1.1" 304 -
+148.87.23.9 - - [11/May/2023 00:30:01] "GET /static/assets/js/plugins/perfect-scrollbar.min.js HTTP/1.1" 304 -
+148.87.23.8 - - [11/May/2023 00:30:01] "GET /static/assets/js/plugins/smooth-scrollbar.min.js HTTP/1.1" 304 -
+148.87.23.13 - - [11/May/2023 00:30:01] "GET /static/assets/js/soft-ui-dashboard.min.js?v=1.0.6 HTTP/1.1" 304 -
+148.87.23.9 - - [11/May/2023 00:30:01] "GET /static/assets/js/dark-mode-handler.js HTTP/1.1" 304 -
+148.87.23.9 - - [11/May/2023 00:30:01] "GET /static/assets/img/curved-images/curved6.jpg HTTP/1.1" 304 -
+148.87.23.13 - - [11/May/2023 00:30:08] "POST /login/jwt/ HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:08] "POST /login HTTP/1.1" 302 -
+148.87.23.13 - - [11/May/2023 00:30:08] "GET / HTTP/1.1" 302 -
+148.87.23.13 - - [11/May/2023 00:30:08] "GET /login HTTP/1.1" 302 -
+148.87.23.9 - - [11/May/2023 00:30:09] "GET /index HTTP/1.1" 200 -
+148.87.23.4 - - [11/May/2023 00:30:09] "GET /static/assets/css/nucleo-icons.css HTTP/1.1" 304 -
+148.87.23.5 - - [11/May/2023 00:30:09] "GET /static/assets/css/nucleo-svg.css HTTP/1.1" 304 -
+148.87.23.4 - - [11/May/2023 00:30:09] "GET /static/assets/css/soft-ui-dashboard.css?v=1.0.6 HTTP/1.1" 304 -
+148.87.23.5 - - [11/May/2023 00:30:09] "GET /static/assets/css/dark-theme-core.css HTTP/1.1" 304 -
+148.87.23.13 - - [11/May/2023 00:30:09] "GET /static/assets/fonts/nucleo-icons.woff2 HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:09] "GET /static/assets/img/logo-ct-dark.png HTTP/1.1" 200 -
+148.87.23.10 - - [11/May/2023 00:30:09] "GET /static/assets/img/shapes/waves-white.svg HTTP/1.1" 200 -
+148.87.23.4 - - [11/May/2023 00:30:09] "GET /static/assets/img/team-2.jpg HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:09] "GET /static/assets/js/core/popper.min.js HTTP/1.1" 304 -
+148.87.23.10 - - [11/May/2023 00:30:09] "GET /static/assets/img/ivancik.jpg HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:09] "GET /static/assets/img/illustrations/rocket-white.png HTTP/1.1" 200 -
+148.87.23.8 - - [11/May/2023 00:30:09] "GET /static/assets/img/curved-images/white-curved.jpg HTTP/1.1" 200 -
+148.87.23.10 - - [11/May/2023 00:30:09] "GET /static/assets/img/small-logos/logo-spotify.svg HTTP/1.1" 200 -
+148.87.23.8 - - [11/May/2023 00:30:09] "GET /static/assets/js/core/bootstrap.min.js HTTP/1.1" 304 -
+148.87.23.12 - - [11/May/2023 00:30:10] "GET /static/assets/js/plugins/perfect-scrollbar.min.js HTTP/1.1" 304 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/js/plugins/smooth-scrollbar.min.js HTTP/1.1" 304 -
+148.87.23.10 - - [11/May/2023 00:30:10] "GET /static/assets/js/dark-mode-handler.js HTTP/1.1" 304 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/js/plugins/chartjs.min.js HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/js/soft-ui-dashboard.min.js?v=1.0.6 HTTP/1.1" 304 -
+148.87.23.10 - - [11/May/2023 00:30:10] "GET /static/assets/img/small-logos/logo-xd.svg HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/img/team-1.jpg HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/img/team-3.jpg HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/img/team-4.jpg HTTP/1.1" 200 -
+148.87.23.10 - - [11/May/2023 00:30:10] "GET /static/assets/img/small-logos/logo-atlassian.svg HTTP/1.1" 200 -
+148.87.23.12 - - [11/May/2023 00:30:10] "GET /static/assets/img/small-logos/logo-slack.svg HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/img/small-logos/logo-jira.svg HTTP/1.1" 200 -
+148.87.23.13 - - [11/May/2023 00:30:10] "GET /static/assets/img/small-logos/logo-invision.svg HTTP/1.1" 200 -
