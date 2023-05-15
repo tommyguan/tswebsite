@@ -16,9 +16,13 @@
               <div class="row">
                 <div class="col-8">
                   <div class="numbers">
-                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Balance By 5/1/2023</p>
+                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Balance By {{ current_user.balance_update_date }}</p>
                     <h5 class="font-weight-bolder mb-0">
-                      $53,000
+                      {% if current_user.current_balance %}
+                  {{ current_user.current_balance }}
+                {% else %}
+                  no balance for {{ current_user.username }}
+                {% endif %}
                       <span class="text-success text-sm font-weight-bolder">+55%</span>
                     </h5>
                   </div>
@@ -38,9 +42,13 @@
               <div class="row">
                 <div class="col-8">
                   <div class="numbers">
-                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Nasdaq</p>
+                    <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Invest</p>
                     <h5 class="font-weight-bolder mb-0">
-                      12,328
+                      {% if current_user.total_invest %}
+                  {{ current_user.total_invest }}
+                {% else %}
+                  no total_invest for {{ current_user.username }}
+                {% endif %}
                       <span class="text-success text-sm font-weight-bolder">+1.1%</span>
                     </h5>
                   </div>
