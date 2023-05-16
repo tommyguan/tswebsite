@@ -29,6 +29,7 @@ class Users(db.Model, UserMixin):
     current_balance = db.Column(db.Integer)
     total_invest = db.Column(db.Integer)
     balance_update_date = db.Column(db.String(100))
+    change = db.Column(db.Integer)
 
     def __init__(self, **kwargs):
         for property, value in kwargs.items():

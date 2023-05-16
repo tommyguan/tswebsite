@@ -97,11 +97,17 @@
                     <p class="text-sm mb-0 text-capitalize font-weight-bold">Balance By {{ current_user.balance_update_date }}</p>
                     <h5 class="font-weight-bolder mb-0">
                       {% if current_user.current_balance %}
-                  {{ current_user.current_balance }}
-                {% else %}
-                  no balance for {{ current_user.username }}
-                {% endif %}
-                      <span class="text-success text-sm font-weight-bolder">+55%</span>
+                        {{ current_user.current_balance }}
+                      {% else %}
+                        NA
+                      {% endif %}
+                      <span class="text-success text-sm font-weight-bolder">
+                        {% if current_user.change %}
+                          {{ current_user.change }} %
+                        {% else %}
+                          NA
+                        {% endif %}
+                      </span>
                     </h5>
                   </div>
                 </div>
@@ -123,11 +129,11 @@
                     <p class="text-sm mb-0 text-capitalize font-weight-bold">Total Invest</p>
                     <h5 class="font-weight-bolder mb-0">
                       {% if current_user.total_invest %}
-                  {{ current_user.total_invest }}
-                {% else %}
-                  no total_invest for {{ current_user.username }}
-                {% endif %}
-                      <span class="text-success text-sm font-weight-bolder">+1.1%</span>
+                        {{ current_user.total_invest }}
+                      {% else %}
+                        NA
+                      {% endif %}
+                     
                     </h5>
                   </div>
                 </div>
@@ -145,13 +151,33 @@
             <div class="card-body p-3">
               <div class="row">
                
-                  <div class="col-6 text-end">
+                  <div class="col-8 text-end">
                     <a class="btn bg-gradient-dark mb-0" href="about-company.html"><i class="fas fa-plus"></i>&nbsp;&nbsp;Deposit</a>
                   </div>
-                  <div class="col-6 text-end">
+                  
+                  <div class="col-4 text-end">
+                    <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                      <i class="ni ni-air-baloon text-lg opacity-10" aria-hidden="true"></i>
+                    </div>
+                  </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-xl-3 col-sm-6 mb-xl-0 mb-4">
+          <div class="card">
+            <div class="card-body p-3">
+              <div class="row">
+               
+                  
+                  <div class="col-8 text-end">
                     <a class="btn bg-gradient-dark mb-0" href="about-company.html"><i class="fas fa-minus"></i>&nbsp;&nbsp;Withdraw</a>
                   </div>
-                
+                  <div class="col-4 text-end">
+                    <div class="icon icon-shape bg-gradient-primary shadow text-center border-radius-md">
+                      <i class="ni ni-trophy text-lg opacity-10" aria-hidden="true"></i>
+                    </div>
+                  </div>
               </div>
             </div>
           </div>
