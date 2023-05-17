@@ -1,0 +1,115 @@
+{% extends 'layouts/base-fullscreen.html' %}
+
+{% block title %} Sign UP {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+<style>
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+  
+  td, th {
+    border: 1px solid #dddddd;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  tr:nth-child(even) {
+    background-color: #dddddd;
+  }
+  </style>
+
+  <div class="container position-sticky z-index-sticky top-1">
+    <div class="row">
+      <div class="col-12">
+
+        <a href="https://localhost/index">Back To Home</a>
+      </div>
+    </div>
+  </div>
+
+  <main class="main-content  mt-0">
+
+    <section class="min-vh-100 mb-8">
+      
+
+              <div class="card-header text-center pt-4">
+                <h5>Update User Balance</h5>
+              </div>
+
+
+
+             
+
+                {% if success %} 
+                
+                  <p class="text-sm mt-3 mb-0 text-center"> 
+                    <div class="text-center">
+                      <a href="{{ url_for('authentication_blueprint.login') }}" class="btn bg-gradient-dark w-100 my-4 mb-2">Sign IN</a>
+                    </div> 
+                  </p>
+
+                {% else %}
+                <h2>List of Users</h2>
+        
+                <table>
+                  <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Current Balance</th>
+                    <th>Change</th>
+                    <th>Interst Rate</th>
+                    <th>Total Invest</th>
+                    <th>Balance Update Date</th>
+                  </tr>
+                  {% for user in users %}
+              <tr>
+                <td>{{ user.id }}</td>
+                        <td>{{ user.name }}</td>
+                        <td>{{ user.current_balance }}</td>
+                        <td>{{ user.change }} %</td>
+                        <td>{{ user.interest_rate }} </td>
+                        <td>{{ user.total_invest }} </td>
+                        <td>{{ user.balance_update_date }} </td>
+                        
+              </tr>
+              {% endfor %}
+                </table>
+                  <form role="form text-left" method="post" action="">
+
+                    {{ form.hidden_tag() }}
+                      <h3>Update User Balance : </h3>
+                      <label><script> document.write(new Date().toLocaleDateString()); </script> Balance</label>
+                      <div class="mb-3">
+                        {{ form.balance(placeholder="Balance", class="form-control") }}
+                      </div>
+                      
+
+                      <div class="text-center">
+                        <button type="submit" name="register" class="btn bg-gradient-dark w-100 my-4 mb-2">Submit</button>
+                      </div>
+
+               
+
+                  </form>
+
+                {% endif %}
+
+             
+         
+    </section>
+
+    {% include "includes/footer-fullscreen.html" %}
+
+  </main>
+
+  {% endblock content %}
+
+  <!-- Specific JS goes HERE --> 
+  {% block javascripts %}{% endblock javascripts %}

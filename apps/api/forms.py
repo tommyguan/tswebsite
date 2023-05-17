@@ -12,3 +12,8 @@ class BookForm(ModelForm):
     class Meta:
         model = Book
 
+
+class UsersForm(ModelForm):
+    class Meta:
+        model = Users
+

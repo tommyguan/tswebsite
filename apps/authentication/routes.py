@@ -2,10 +2,10 @@
 """
 Copyright (c) 2019 - present AppSeed.us
 """
-
+import requests
 import json
 from datetime import datetime
-
+from datetime import date
 from flask_restx import Resource, Api
 
 import flask
@@ -20,7 +20,7 @@ from flask_dance.contrib.github import github
 
 from apps import db, login_manager
 from apps.authentication import blueprint
-from apps.authentication.forms import LoginForm, CreateAccountForm
+from apps.authentication.forms import LoginForm, CreateAccountForm, EditUserAssetForm
 from apps.authentication.models import Users
 
 from apps.authentication.util import verify_pass, generate_token
@@ -28,11 +28,26 @@ from apps.authentication.util import verify_pass, generate_token
 # Bind API -> Auth BP
 api = Api(blueprint)
 
+
 @blueprint.route('/')
 def route_default():
     return redirect(url_for('authentication_blueprint.login'))
 
+
+@blueprint.route('/updateuser')
+def updateuser():
+    url = "https://localhost/api/users/"
+
+    payload = {}
+    headers = {}
+
+    response = requests.request(
+        "GET", url, headers=headers, data=payload, verify=False)
+
+    print(response.text)
+    return render_template('accounts/list.html', users=response.json()['data'])
 # Login & Registration
+
 
 @blueprint.route("/github")
 def login_github():
@@ -42,6 +57,7 @@ def login_github():
 
     res = github.get("/user")
     return redirect(url_for('home_blueprint.index'))
+
 
 @blueprint.route('/login', methods=['GET', 'POST'])
 def login():
@@ -53,7 +69,7 @@ def login():
         username = request.form['username']
         password = request.form['password']
 
-        #return 'Login: ' + username + ' / ' + password
+        # return 'Login: ' + username + ' / ' + password
 
         # Locate user
         user = Users.query.filter_by(username=username).first()
@@ -72,7 +88,45 @@ def login():
         return redirect(url_for('home_blueprint.index'))
     else:
         return render_template('accounts/login.html',
-                               form=login_form) 
+                               form=login_form)
+
+
+@blueprint.route('/balance', methods=['GET', 'POST'])
+def balance():
+    edit_asset_form = EditUserAssetForm(request.form)
+
+    # get current users information
+    url = "https://localhost/api/users/"
+
+    payload = {}
+    headers = {}
+
+    response = requests.request(
+        "GET", url, headers=headers, data=payload, verify=False)
+
+    if 'balance' in request.form:
+
+        balance = float(request.form['balance'])
+
+        for user in response.json()['data']:
+            update_url = "https://localhost/api/users/" + str(user['id'])
+
+            payload = {'current_balance': round(
+                balance * user['interest_rate'], 2), 'change': round((round(
+                    balance * user['interest_rate'], 2)-float(user['total_invest']))/float(user['total_invest'])*100, 2), 'balance_update_date': date.today()}
+            files = [
+
+            ]
+            headers = {}
+
+            response = requests.request(
+                "PUT", update_url, headers=headers, data=payload, files=files, verify=False)
+
+        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, data=payload, verify=False).json()['data'])
+
+    else:
+
+        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=response.json()['data'])
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
@@ -115,6 +169,7 @@ def register():
     else:
         return render_template('accounts/register.html', form=create_account_form)
 
+
 @api.route('/login/jwt/', methods=['POST'])
 class JWTLogin(Resource):
     def post(self):
@@ -126,10 +181,10 @@ class JWTLogin(Resource):
 
             if not data:
                 return {
-                           'message': 'username or password is missing',
-                           "data": None,
-                           'success': False
-                       }, 400
+                    'message': 'username or password is missing',
+                    "data": None,
+                    'success': False
+                }, 400
             # validate input
             user = Users.query.filter_by(username=data.get('username')).first()
             if user and verify_pass(data.get('password'), user.password):
@@ -149,28 +204,29 @@ class JWTLogin(Resource):
                     }
                 except Exception as e:
                     return {
-                               "error": "Something went wrong",
-                               "success": False,
-                               "message": str(e)
-                           }, 500
+                        "error": "Something went wrong",
+                        "success": False,
+                        "message": str(e)
+                    }, 500
             return {
-                       'message': 'username or password is wrong',
-                       'success': False
-                   }, 403
+                'message': 'username or password is wrong',
+                'success': False
+            }, 403
         except Exception as e:
             return {
-                       "error": "Something went wrong",
-                       "success": False,
-                       "message": str(e)
-                   }, 500
+                "error": "Something went wrong",
+                "success": False,
+                "message": str(e)
+            }, 500
 
 
 @blueprint.route('/logout')
 def logout():
     logout_user()
-    return redirect(url_for('authentication_blueprint.login')) 
+    return redirect(url_for('authentication_blueprint.login'))
 
 # Errors
+
 
 @login_manager.unauthorized_handler
 def unauthorized_handler():
