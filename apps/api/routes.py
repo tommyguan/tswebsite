@@ -140,6 +140,16 @@ class UsersRoute(Resource):
             all_objects = Users.query.all()
             output = [
                 {'id': obj.id, "name": obj.username, "total_invest": obj.total_invest, "change": obj.change, "interest_rate": obj.interest_rate, "current_balance": obj.current_balance, "balance_update_date": obj.balance_update_date} for obj in all_objects]
+        elif model_id == 0:
+            all_objects = Users.query.all()
+            total_interest_rate = 0
+            total_invest = 0
+            total_balance = 0
+            for obj in all_objects:
+                total_interest_rate = total_interest_rate + obj.interest_rate
+                total_invest = total_invest + obj.total_invest
+                total_balance = total_balance + obj.current_balance
+            output = [{'id': 'Total','total_interest_rate': round(total_interest_rate,8), 'total_invest':total_invest, 'total_balance':round(total_balance,2)}]
         else:
             obj = Users.query.get(model_id)
             if obj is None:

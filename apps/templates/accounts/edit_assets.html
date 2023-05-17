@@ -69,17 +69,28 @@
                     <th>Balance Update Date</th>
                   </tr>
                   {% for user in users %}
+                  
               <tr>
                 <td>{{ user.id }}</td>
-                        <td>{{ user.name }}</td>
-                        <td>{{ user.current_balance }}</td>
-                        <td>{{ user.change }} %</td>
-                        <td>{{ user.interest_rate }} </td>
-                        <td>{{ user.total_invest }} </td>
-                        <td>{{ user.balance_update_date }} </td>
+                <td>{{ user.name }}</td>
+                <td>{{ user.current_balance }}</td>
+                <td>{{ user.change }} %</td>
+                <td>{{ user.interest_rate }} </td>
+                <td>{{ user.total_invest }} </td>
+                <td>{{ user.balance_update_date }} </td>
                         
               </tr>
               {% endfor %}
+              <tr>
+                <td>Total</td>
+                <td></td>
+                <td>{{ total[0].total_balance }}</td>
+                <td></td>
+                <td>{{ total[0].total_interest_rate }} % </td>
+                <td>{{ total[0].total_invest }} </td>
+                <td></td>
+                        
+              </tr>
                 </table>
                   <form role="form text-left" method="post" action="">
 

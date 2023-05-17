@@ -29,6 +29,7 @@ from apps.authentication.util import verify_pass, generate_token
 api = Api(blueprint)
 
 server='52.52.192.236'
+#server = 'localhost'
 
 @blueprint.route('/')
 def route_default():
@@ -98,12 +99,14 @@ def balance():
 
     # get current users information
     url = "https://"+server+"/api/users/"
+    #get total information
+    total_url = "https://"+server+"/api/users/0"
 
-    payload = {}
     headers = {}
 
-    response = requests.request(
-        "GET", url, headers=headers, data=payload, verify=False)
+    payload = {}
+
+    response = requests.request("GET", url, headers=headers, verify=False)
 
     if 'balance' in request.form:
 
@@ -118,16 +121,21 @@ def balance():
             files = [
 
             ]
-            headers = {}
-
+            
             response = requests.request(
                 "PUT", update_url, headers=headers, data=payload, files=files, verify=False)
+            
+        #validate total balance of each user add up is the total balance of company account
+        total = requests.request("GET", total_url, headers=headers, verify=False).json()['data']
+        gap = abs(float(total[0]['total_balance']) - balance)
+        if(gap > 10):
+            return 'There is problem. The balance of each user addup has a big gap with the company total balance, Please contact SUPPORT ASAP. The GAP is ' + str(gap)
 
-        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, data=payload, verify=False).json()['data'])
+        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, data=payload, verify=False).json()['data'],total=total)
 
     else:
 
-        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=response.json()['data'])
+        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, verify=False).json()['data'],total=requests.request("GET", total_url, headers=headers, data=payload, verify=False).json()['data'])
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])
