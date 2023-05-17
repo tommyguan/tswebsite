@@ -28,6 +28,7 @@ from apps.authentication.util import verify_pass, generate_token
 # Bind API -> Auth BP
 api = Api(blueprint)
 
+server='52.52.192.236'
 
 @blueprint.route('/')
 def route_default():
@@ -36,7 +37,7 @@ def route_default():
 
 @blueprint.route('/updateuser')
 def updateuser():
-    url = "https://localhost/api/users/"
+    url = "https://" + server + "/api/users/"
 
     payload = {}
     headers = {}
@@ -96,7 +97,7 @@ def balance():
     edit_asset_form = EditUserAssetForm(request.form)
 
     # get current users information
-    url = "https://localhost/api/users/"
+    url = "https://"+server+"/api/users/"
 
     payload = {}
     headers = {}
@@ -109,7 +110,7 @@ def balance():
         balance = float(request.form['balance'])
 
         for user in response.json()['data']:
-            update_url = "https://localhost/api/users/" + str(user['id'])
+            update_url = "https://"+server+"/api/users/" + str(user['id'])
 
             payload = {'current_balance': round(
                 balance * user['interest_rate'], 2), 'change': round((round(
