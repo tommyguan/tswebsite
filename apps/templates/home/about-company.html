@@ -1,6 +1,6 @@
 {% extends 'layouts/base.html' %}
 
-{% block title %} API sample {% endblock title %}
+{% block title %} About US {% endblock title %}
 
 <!-- Specific CSS goes HERE -->
 {% block stylesheets %}{% endblock stylesheets %}
@@ -76,7 +76,7 @@
 
     </div>
 
-    
+    <h1>new Data:<span id = "userID"></span></h1>
     {% include "includes/footer.html" %}
 
   </div>
@@ -136,162 +136,21 @@
 <!-- Specific JS goes HERE --> 
 {% block javascripts %}
 
-  <script>
 
-    const token       = localStorage.getItem('token') || ''
-    let data          = []
-    let requestAction = 'post' // for update/add record
-
-    // fetch data
-    fetch('/api/books/',{
-        method: 'GET'
+<script>
+  function fetch_data(){
+    fetch("https://jsonplaceholder.typicode.com/todos/1")
+    .then(res => res.json())
+    .then(d => {
+      document.getElementById('userID').innerText = d.title + Date.now()
+      console.log(d)
     })
-        .then((response) => {
-            if(!response.ok)
-                return response.text().then(text => { throw new Error(text) })
-            else
-                return response.json()
-        })
-        .then((res) => {
-            const itemContainer = document.querySelector('.list-group');
-            itemContainer.innerHTML = '';
-            console.log(res);
-            data = res.data
-
-            res.data.map((d) => {
-                
-                //itemContainer.innerHTML += d.id + " -> " + d.title + "<br />";
-
-                const item = `<li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                      <div class="d-flex flex-column">
-                        <span class="text-xs">id: <span class="text-dark ms-sm-2 font-weight-bold" id="model-id">${d.id}</span></span>
-                        <span class="text-xs">name: <span class="text-dark ms-sm-2 font-weight-bold" id="model-name">${d.title}</span></span>
-                      </div>
-                      <div class="ms-auto text-end">
-                        <a class="btn btn-link text-danger text-gradient px-3 mb-0 delete" href="javascript:;" id="${d.id}"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                        <a class="btn btn-link text-dark px-3 mb-0 edit" href="javascript:;" id="${d.id}"
-                              data-bs-toggle="modal" data-bs-target="#editModal"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                      </div>
-                    </li>`
-
-                  itemContainer.innerHTML += item;   
-
-                //Object.keys(d).map((key) => {
-
-                  //let ID   = key   ;
-                  //let NAME = d[key];
-
-                  //itemContainer.innerHTML += ID + " -> " + NAME + "<br />";
-
-                  /*
-                  const item = `<li class="list-group-item border-0 d-flex p-4 mb-2 bg-gray-100 border-radius-lg">
-                      <div class="d-flex flex-column">
-                        <span class="text-xs">id: <span class="text-dark ms-sm-2 font-weight-bold" id="model-id">${ID}</span></span>
-                        <span class="text-xs">name: <span class="text-dark ms-sm-2 font-weight-bold" id="model-name">${NAME}</span></span>
-                      </div>
-                      <div class="ms-auto text-end">
-                        <a class="btn btn-link text-danger text-gradient px-3 mb-0 delete" href="javascript:;" id="${ID}"><i class="far fa-trash-alt me-2"></i>Delete</a>
-                        <a class="btn btn-link text-dark px-3 mb-0 edit" href="javascript:;" id="${NAME}"
-                              data-bs-toggle="modal" data-bs-target="#exampleModal"><i class="fas fa-pencil-alt text-dark me-2" aria-hidden="true"></i>Edit</a>
-                      </div>
-                    </li>`
-
-                  itemContainer.innerHTML += item;   
-                  */   
-                    
-                //})
-            })
-        })
-        .catch((err) => {
-            console.log(err)
-        })
-
-    // create request
-    document.getElementById('create-form').onsubmit = (e) => {
-        e.preventDefault()
-        fetch('/api/books/',{
-            method: 'POST',
-            body: new FormData(e.target),
-            headers: {"Authorization": `${token}`}
-        })
-            .then((response) => {
-                if(!response.ok)
-                    return response.text().then(text => { throw new Error(text) })
-                else
-                    return response.json()
-            })
-            .then((res) => {
-                console.log(res)
-                location.reload()
-            })
-            .catch((err) => {
-                document.getElementById('create-error').textContent = err
-            })
-    }
-
-    document.getElementById('edit-form').onsubmit = (e) => {
-          e.preventDefault()
-          const formData = new FormData(e.target)
-
-          fetch(`/api/books/${formData.get('id')}/`,{
-              method: 'PUT',
-              body: formData,
-              headers: {"Authorization": `${token}`}
-          })
-              .then((response) => {
-                  if(!response.ok)
-                      return response.text().then(text => { throw new Error(text) })
-                  else
-                      return response.json()
-              })
-              .then((res) => {
-                  console.log(res)
-                  location.reload()
-              })
-              .catch((err) => {
-                  document.getElementById('edit-error').textContent = err
-              })
-      }
-
-      document.querySelector('.list-group').addEventListener('click' , (e) => {
-
-        if (e.target.nodeName === 'A') {
-            if (e.target.className.includes('edit')) {
-                editAction(e.target.id)
-                requestAction = 'put'
-            } else if (e.target.className.includes('delete'))
-                deleteAction(e.target.id)
-
-        }
-      })
-
-      const deleteAction = (id) => {
-
-          const modelName = 'books'
-          fetch(`/api/${modelName}/${id}/`,{
-              method: 'DELETE',
-              headers: {"Authorization": `${token}`}
-          })
-              .then(response => response.json())
-              .then(res => {
-                  location.reload()
-                  console.log(res)
-              })
-              .catch(err => {console.log(err)})
-      }
-
-      const editAction =  (id) => {
-
-          console.log( ' EDIT id -> ' + id )
-
-          // get data from template
-          const item = data.filter(d => d.id.toString() === id)[0]
-          console.log(' EDIT -> ' + item.id + ' / ' + item.title )
-          
-          document.getElementById('edit_title').value = item.title
-          document.getElementById('edit_id').value = item.id
-      }
-
+  }
+    
+    setInterval(function(){
+      fetch_data();},1000)
+    
   </script>
+
 
 {% endblock javascripts %}
