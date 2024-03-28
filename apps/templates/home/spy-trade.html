@@ -1,0 +1,87 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %} SPY Trade {% endblock title %}
+
+<!-- Specific CSS goes HERE -->
+{% block stylesheets %}{% endblock stylesheets %}
+
+{% block content %}
+
+    <div class="container-fluid py-4">
+    <div class="alert alert-warning" role="alert">
+      <h4>SPY Price : <span id = "spy_price"></span> | SPY Strike Price : <span id = "spy_srike_price"></span></h4>
+    </div>
+    <h3>Portfolio Balance</h3>
+    <h5>Cash : <span id = "cash"></span> | Buying Power : <span id = "buying_power"></span> | Net Asset : <span id = "net_asset"></span> </h5>
+    <h3>SPY Portfolio</h3>
+    <h5>SPY Position : <span id = "spy_position"></span> | Call Amount : <span id = "call_amt"></span> | Put Amount : <span id = "put_amt"></span> </h5>
+    <h5>Position To Roll: <span id = "position_to_roll"></span></h5>
+    <textarea id="positionsToRoll" name="positionsToRoll"></textarea>
+    {% include "includes/footer.html" %}
+
+  </div>
+
+{% endblock content %}
+
+<!-- Specific JS goes HERE --> 
+{% block javascripts %}
+
+
+<script>
+  function fetch_data(){
+    fetch("https://jsonplaceholder.typicode.com/todos/1")
+    .then(res => res.json())
+    .then(d => {
+      document.getElementById('userID').innerText = d.title + Date.now()
+      console.log(d)
+    })
+  }
+
+  function fetch_spy_price(){
+    //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
+    fetch("https://54.151.16.77:5000/price_spy")
+    .then(res => res.json())
+    .then(d => {
+      document.getElementById('spy_price').innerText = d.spy_price
+      document.getElementById('spy_srike_price').innerText = d.strike_price
+      console.log(d)
+    })
+  }
+
+  function fetch_balance(){
+    //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
+    fetch("https://54.151.16.77:5000/balance")
+    .then(res => res.json())
+    .then(d => {
+      document.getElementById('cash').innerText = d.cash
+      document.getElementById('buying_power').innerText = d.buying_power
+      document.getElementById('net_asset').innerText = d.net_asset
+      console.log(d)
+    })
+  }
+
+  function fetch_spy_portfolio(){
+    //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
+    fetch("https://54.151.16.77:5000/my_portfolio_spy")
+    .then(res => res.json())
+    .then(d => {
+      document.getElementById('spy_position').innerText = d.spy_position
+      document.getElementById('call_amt').innerText = d.call_amt
+      document.getElementById('put_amt').innerText = d.put_amt
+      //alert(d.positions_to_roll[0][0])
+      //document.getElementById('position_to_roll').innerText = d.positions_to_roll[0][0]
+      document.getElementById('positionsToRoll').innerHTML = d.positions_to_roll[0][1].conId+"\n"+d.positions_to_roll[1][1].conId
+      console.log(d)
+    })
+  }
+
+setInterval(function(){
+  fetch_spy_price();
+  fetch_balance();
+  fetch_spy_portfolio();
+},1000)
+    
+  </script>
+
+
+{% endblock javascripts %}

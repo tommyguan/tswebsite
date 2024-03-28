@@ -92,6 +92,9 @@ def login():
         return render_template('accounts/login.html',
                                form=login_form)
 
+@blueprint.route('/spy_trade', methods=['GET', 'POST'])
+def spy_trade():
+    return render_template('home/spy-trade.html')
 
 @blueprint.route('/balance', methods=['GET', 'POST'])
 def balance():
