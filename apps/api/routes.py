@@ -13,7 +13,6 @@ from apps.models import *
 
 api = Api(blueprint)
 
-
 @api.route('/books/', methods=['POST', 'GET', 'DELETE', 'PUT'])
 @api.route('/books/<int:model_id>/', methods=['GET', 'DELETE', 'PUT'])
 class BookRoute(Resource):

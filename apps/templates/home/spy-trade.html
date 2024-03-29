@@ -16,7 +16,7 @@
     <h3>SPY Portfolio</h3>
     <h5>SPY Position : <span id = "spy_position"></span> | Call Amount : <span id = "call_amt"></span> | Put Amount : <span id = "put_amt"></span> </h5>
     <h5>Position To Roll: <span id = "position_to_roll"></span></h5>
-    <textarea id="positionsToRoll" name="positionsToRoll"></textarea>
+    <textarea id="positionsToRoll" name="positionsToRoll" rows="5" cols="60"></textarea>
     {% include "includes/footer.html" %}
 
   </div>
@@ -39,10 +39,10 @@
 
   function fetch_spy_price(){
     //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
-    fetch("https://54.151.16.77:5000/price_spy")
+    fetch("/trade/price")
     .then(res => res.json())
     .then(d => {
-      document.getElementById('spy_price').innerText = d.spy_price
+      document.getElementById('spy_price').innerText = d.price
       document.getElementById('spy_srike_price').innerText = d.strike_price
       console.log(d)
     })
@@ -50,7 +50,7 @@
 
   function fetch_balance(){
     //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
-    fetch("https://54.151.16.77:5000/balance")
+    fetch("/trade/account_balance")
     .then(res => res.json())
     .then(d => {
       document.getElementById('cash').innerText = d.cash
@@ -62,7 +62,7 @@
 
   function fetch_spy_portfolio(){
     //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
-    fetch("https://54.151.16.77:5000/my_portfolio_spy")
+    fetch("/trade/portfolio_spy")
     .then(res => res.json())
     .then(d => {
       document.getElementById('spy_position').innerText = d.spy_position
@@ -70,7 +70,11 @@
       document.getElementById('put_amt').innerText = d.put_amt
       //alert(d.positions_to_roll[0][0])
       //document.getElementById('position_to_roll').innerText = d.positions_to_roll[0][0]
-      document.getElementById('positionsToRoll').innerHTML = d.positions_to_roll[0][1].conId+"\n"+d.positions_to_roll[1][1].conId
+      var position_to_roll_str = "Right  LastTradeDate  Strike  Position " + "\n"
+      for (position_to_roll of d.positions_to_roll) {
+        position_to_roll_str = position_to_roll_str + position_to_roll[1].right+ "          " + position_to_roll[1].lastTradeDateOrContractMonth+ "             " + position_to_roll[1].strike+ "       " + position_to_roll[2]+ "  "+"\n"
+      }
+      document.getElementById('positionsToRoll').innerHTML = position_to_roll_str
       console.log(d)
     })
   }

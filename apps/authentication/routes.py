@@ -7,8 +7,11 @@ import json
 from datetime import datetime
 from datetime import date
 from flask_restx import Resource, Api
-
+from flask_login import login_required
+from apps.api.spy import *  # Import the utils module
+from apps.api import ib
 import flask
+import finnhub
 from flask import render_template, redirect, request, url_for
 from flask_login import (
     current_user,
@@ -92,11 +95,70 @@ def login():
         return render_template('accounts/login.html',
                                form=login_form)
 
+@blueprint.route('/trade/account_balance', methods=['GET', 'POST'])
+#@login_required
+def account_balance():
+    if(ib is None):
+        return {
+            'message': 'Fail to connect to IB !!!',
+            'success': False
+        }, 500
+    else:
+        cash, buying_power, net_asset = portfolio_balance(ib)
+        return {
+            'cash': cash,
+            'buying_power': buying_power,
+            'net_asset': net_asset,
+            'success': True
+        }, 200
+
+@blueprint.route('/trade/portfolio_spy', methods=['GET', 'POST'])
+#@login_required
+def current_portfolio_spy():
+    if(ib is None):
+        return {
+            'message': 'Fail to connect to IB !!!',
+            'success': False
+        }, 500
+    else:
+        spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy(ib)
+        return {
+            'spy_position': spy_position,
+            'call_amt': call_amt,
+            'put_amt': put_amt,
+            'positions_to_roll': positions_to_roll,
+            'success': True
+        }, 200
+
+@blueprint.route('/trade/price', methods=['GET', 'POST'])
+#@login_required
+def price():
+    if(ib is None):
+        return {
+            'message': 'Fail to connect to IB !!!',
+            'success': False
+        }, 500
+    else:
+        FINN_KEY = 'cnn6ls9r01qq36n5qi6gcnn6ls9r01qq36n5qi70'
+        finnhub_client = finnhub.Client(api_key=FINN_KEY)
+
+        symbol = 'SPY'
+        current_price = finnhub_client.quote(symbol)['c']
+        strike_price = math.ceil(current_price)
+        return {
+            'symbol': symbol,
+            'price': current_price,
+            'strike_price': strike_price,
+            'success': True
+        }, 200
+    
 @blueprint.route('/spy_trade', methods=['GET', 'POST'])
+#@login_required
 def spy_trade():
     return render_template('home/spy-trade.html')
 
 @blueprint.route('/balance', methods=['GET', 'POST'])
+#@login_required
 def balance():
     edit_asset_form = EditUserAssetForm(request.form)
 
