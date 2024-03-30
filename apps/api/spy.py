@@ -8,7 +8,7 @@ from pandas_market_calendars import get_calendar
 from datetime import datetime
 
 
-def spread_order(ib, amt,  long_strike, long_exp,  short_strike, short_exp,right = 'C'):
+def spread_order(ib, amt,  long_strike, long_exp,  short_strike, short_exp, right, account):
     
     long_option = Option('SPY', long_exp, long_strike, right, exchange='SMART', multiplier='100')
     short_option = Option('SPY', short_exp, short_strike, right, exchange='SMART', multiplier='100') 
@@ -17,47 +17,51 @@ def spread_order(ib, amt,  long_strike, long_exp,  short_strike, short_exp,right
     
     combo_Legs = [ComboLeg(conId=short_option.conId,ratio=1, action='SELL',exchange='SMART'),ComboLeg(conId=long_option.conId,ratio=1, action='BUY',exchange='SMART')  ]
 
-    '''
-    # Shorter-term option
-    shorter_term_option = spy_contract.option(short_exp, short_strike, right, 'SMART')
 
-    # Longer-term option
-    longer_term_option = spy_contract.option(long_exp, long_strike, right, 'SMART')
-    ib.qualifyContracts(shorter_term_option, longer_term_option)
-    shorter_term_ticker = ib.reqTickers(shorter_term_option)
-    longer_term_ticker = ib.reqTickers(longer_term_option)
+##nbbo price
+
+    short_ticker = ib.reqTickers(short_option)[0]
+    long_ticker = ib.reqTickers(long_option)[0]
     
-    shorter_term_mid = (shorter_term_ticker.bid + shorter_term_ticker.ask) / 2
-    longer_term_mid = (longer_term_ticker.bid + longer_term_ticker.ask) / 2
-    limit_price = longer_term_mid - shorter_term_mid
-     '''   
+    short_mid = (short_ticker.bid + short_ticker.ask) / 2
+    long_mid = (long_ticker.bid + long_ticker.ask) / 2
+    limit_price = long_mid - short_mid
+    
     
     combo = Bag(symbol='SPY', comboLegs=combo_Legs,exchange='SMART', currency='USD')
     
-    trade =ib.placeOrder(combo,LimitOrder("BUY", amt, -1.4))
+    trade =ib.placeOrder(combo,LimitOrder("BUY", amt, limit_price), account=account)
     
     print(trade)
     trade.isDone()  # Wait for the order to be filled
 
  
 
-def rollout(ib, position_to_roll, short_strike, short_exp,right = 'C'):
+def rollout(ib, position_to_roll, short_strike, short_exp, right, account):
     
     long_option = position_to_roll.contract
     amt = -(position_to_roll.position)
     short_option = Option('SPY', short_exp, short_strike, right, exchange='SMART', multiplier='100') 
 
     ib.qualifyContracts(short_option,long_option)
+
+    ##nbbo price
+
+    short_ticker = ib.reqTickers(short_option)[0]
+    long_ticker = ib.reqTickers(long_option)[0]
+
+    short_mid = (short_ticker.bid + short_ticker.ask) / 2
+    long_mid = (long_ticker.bid + long_ticker.ask) / 2
+    limit_price = long_mid - short_mid
     
     combo_Legs = [ComboLeg(conId=short_option.conId,ratio=1, action='SELL',exchange='SMART'),ComboLeg(conId=long_option.conId,ratio=1, action='BUY',exchange='SMART')]
    
     combo = Bag(symbol='SPY', comboLegs=combo_Legs,exchange='SMART', currency='USD')
 
     if not if_order_exists(ib, combo):
-        #trade =ib.placeOrder(combo,LimitOrder("BUY", amt, -1.4))
-        trade =ib.placeOrder(combo,MarketOrder("BUY", amt))
-        print("trade:",trade)
-        trade.isDone()  # Wait for the order to be filled
+        trade =ib.placeOrder(combo,LimitOrder("BUY", amt, limit_price), account)
+        print(trade)
+        #trade.isDone()  # Wait for the order to be filled
 
 def if_order_exists(ib, contract):
 
@@ -75,39 +79,39 @@ def if_order_exists(ib, contract):
 
 
 
-def sell_option (ib, amt, exp, strike_price, right):
+def sell_option (ib, amt, exp, strike_price, right, account):
   
     contract = Option('SPY', exp, strike_price, right, 'SMART', multiplier='100')
 
 
 # Request market data for the SPY put option
     ib.qualifyContracts(contract)
-    #ticker = ib.reqTickers(contract)[0]
+    ticker = ib.reqTickers(contract)[0]
 
 # Calculate the midpoint between the bid and ask prices
-    #midpoint = (ticker.bid + ticker.ask) / 2
-    #print("midpoint: ", midpoint)
+    limit_price = (ticker.bid + ticker.ask) / 2
+    
 # Place a limit order to sell the SPY put option at the midpoint price
-    order = MarketOrder('SELL', amt)
+    order = LimitOrder('SELL', amt, limit_price)
 
 # Place the order
-    trade = ib.placeOrder(contract, order)
+    trade = ib.placeOrder(contract, order, account)
 
 
     print("Trade:", trade)
 
-    # Wait for the order to fill
-    trade.isDone()  # Wait for the order to be filled
+# Wait for the order to fill
+    #trade.isDone()  # Wait for the order to be filled
     print(f"Order Status: {trade.orderStatus}")
-    #trade = ib.placeOrder(put_option, order)
+    
    # ib.disconnect()
 
 def get_quote (ib, symbol):
     contract = Stock(symbol, 'SMART', 'USD')
 
     ib.qualifyContracts(contract)
-    ib.reqMarketDataType(4)
-    [ticker] = ib.reqTickers(contract)
+
+    ticker = ib.reqTickers(contract)[0]
     value = ticker.marketPrice()
     return value
 
@@ -127,8 +131,8 @@ def get_date ():
 
 
 
-def portfolio_balance (ib):
-    account_values = ib.accountValues()    
+def portfolio_balance (ib, account):
+    account_values = ib.accountValues(account)    
 
     cash = buying_power = net_asset = 0
 
@@ -164,12 +168,12 @@ def get_beta(symbol):
     return beta
 
 
-def portfolio_spy (ib):
+def portfolio_spy (ib,account):
     spy_position = call_amt = put_amt = 0
     positions_to_roll = []
     weighted_delta = weighted_theta = 0
     
-    positions = ib.positions()
+    positions = ib.positions(account)
     for p in positions:
         if p.contract.secType == 'STK' and p.contract.symbol == 'SPY':
             spy_position = p.position /100
@@ -199,49 +203,113 @@ def portfolio_spy (ib):
 
 
 
-def do_at_open():
-    
-    today_date = datetime.today().strftime('%Y%m%d')
-    cash, buying_power, net_asset = portfolio_balance()
- 
-    spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy()
-    
-    ##### sell CC if cc_amt > 0
-    current_price = get_quote('SPY')
-    
-    strike_price = math.ceil(current_price)
-    cc_amt = 5 if spy_position + call_amt > 5 else spy_position + call_amt 
-    
-    if cc_amt > 0:
-        sell_option(cc_amt, today_date, strike_price, 'C')
+def do_at_open(account):
+
+
+    current_date = datetime.now()
+    print(current_date)
+    today_date = current_date.strftime('%Y%m%d')
+
+    print("Today's date in YYYYMMDD format:", today_date)
+    # Create a market calendar for the NYSE (New York Stock Exchange)
+
+    nyse = get_calendar('XNYS')
+    is_trading_day = nyse.valid_days(start_date=today_date, end_date=today_date).size > 0
+
+    ###change ip and port: tws paper: 7497 real: 7496
+    if is_trading_day:
+        FINN_KEY = 'cnn6ls9r01qq36n5qi6gcnn6ls9r01qq36n5qi70'
+        finnhub_client = finnhub.Client(api_key=FINN_KEY)
         
-    ##### sell puts:
-    max_position = int(net_asset * 2.5 / current_price / 100)
-    if spy_put_position == 0 and (cash / net_asset > 0.3):
+        util.startLoop()
+        ib = IB()
+        ib.connect('127.0.0.1', 7496, clientId=88)
 
-        short_put_amt = 5 if max_position - spy_position > 5 else max_position - spy_position
+        accounts = ib.managedAccounts()
 
-        sell_option(short_put_amt, today_date, strike_price, 'P')
+        # Print the list of accounts
+        #print("Accounts under management:")
+        for account in accounts:
+            cash, buying_power, net_asset = portfolio_balance(ib, account)
+            spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy(ib, account)
+
+            ##### sell CC if cc_amt > 0
+        
+            symbol = 'SPY'
+            #current_price = finnhub_client.quote(symbol)['c']
+            current_price = get_quote(ib, symbol)
+
+
+            strike_price = math.ceil(current_price)
+            cc_amt = 5 if spy_position + call_amt > 5 else spy_position + call_amt
+
+            if cc_amt > 0:
+                sell_option(ib, cc_amt, today_date, strike_price, 'C', account)
+
+                ##### sell puts:
+                max_position = int(net_asset * 2.5 / current_price / 100)
+                if put_amt == 0 :
+
+                    short_put_amt = 5 if max_position - spy_position > 5 else max_position - spy_position
+                    sell_option(ib, short_put_amt, today_date, strike_price, 'P', account)
+
+        ib.disconnect()
+
+    else:
+        print("Today is not a trading day.")
+
     
 
 
+def do_at_close(account):
+    current_date = datetime.now()
+    print(current_date)
+    today_date = current_date.strftime('%Y%m%d')
+    print("Today's date in YYYYMMDD format:", today_date)
+    # Create a market calendar for the NYSE (New York Stock Exchange)
+    
+    nyse = get_calendar('XNYS')
+    is_trading_day = nyse.valid_days(start_date=today_date, end_date=today_date).size > 0
 
-def do_at_close():
-    today_date, next_trading_day = get_date()
-    cash, buying_power, net_asset = portfolio_balance()
 
-    spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy()
+    if is_trading_day:
+    
+        next_trading_day = nyse.valid_days(start_date=datetime.today(), end_date=datetime.today() + pd.Timedelta(days=10))[1].strftime('%Y%m%d')
+        print("Next trading day after", today_date, "is:", next_trading_day)
 
-    current_price = get_quote('SPY')
-    strike_price = math.ceil(current_price)
-    ##### roll cc and short putif expire today:
-    for p in positions_to_roll:
-  
-        if p.contract.lastTradeDateOrContractMonth == today_date:
-            print("position to roll:", p)
-            if abs(p.contract.strike - current_price) <= 3:
-                strike_price = math.ceil(current_price)
-                rollout(p, strike_price, next_trading_day_str,p.contract.right)
+        FINN_KEY = 'cnn6ls9r01qq36n5qi6gcnn6ls9r01qq36n5qi70'
+        finnhub_client = finnhub.Client(api_key=FINN_KEY)
+
+        symbol = 'SPY'
+        current_price = finnhub_client.quote(symbol)['c']
+        print("current price: ", current_price)
+
+        
+        ###change ip and port: tws paper: 7497 real: 7496
+        util.startLoop()
+        ib = IB()
+        ib.connect('127.0.0.1', 7496, clientId=88)
+
+        for account in accounts:
+            cash, buying_power, net_asset = portfolio_balance(ib, account)
+            spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy(ib, account)
+
+            for p in positions_to_roll:
+                if p.contract.lastTradeDateOrContractMonth == today_date:
+                    #print("position to roll:", p)
+                    if abs(p.contract.strike - current_price) <= 3:
+                        rollout(ib, p, p.contract.strike, next_trading_day, p.contract.right, account)
+
+        ib.disconnect()
+
+    else:
+        print("Today is not a trading day.")
+
+
+
+
+
+
     
 
 

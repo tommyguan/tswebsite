@@ -104,7 +104,7 @@ def account_balance():
             'success': False
         }, 500
     else:
-        cash, buying_power, net_asset = portfolio_balance(ib)
+        cash, buying_power, net_asset = portfolio_balance(ib,'U2120530')
         return {
             'cash': cash,
             'buying_power': buying_power,
@@ -121,7 +121,7 @@ def current_portfolio_spy():
             'success': False
         }, 500
     else:
-        spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy(ib)
+        spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy(ib,'U2120530')
         return {
             'spy_position': spy_position,
             'call_amt': call_amt,
