@@ -12,6 +12,7 @@ from apps.api.spy import *  # Import the utils module
 from apps.api import ib
 import flask
 import finnhub
+import asyncio
 from flask import render_template, redirect, request, url_for
 from flask_login import (
     current_user,
@@ -127,6 +128,25 @@ def current_portfolio_spy():
             'call_amt': call_amt,
             'put_amt': put_amt,
             'positions_to_roll': positions_to_roll,
+            'success': True
+        }, 200
+    
+@blueprint.route('/trade/open_orders', methods=['GET', 'POST'])
+#@login_required
+def open_orders():
+    if(ib is None):
+        return {
+            'message': 'Fail to connect to IB !!!',
+            'success': False
+        }, 500
+    else:
+        open_orders = open_trades(ib)
+        #trade_dicts = [util.tree(trade) for trade in open_orders]
+
+        # Convert trade dictionaries to JSON format
+        #trade_json = json.dumps(trade_dicts, default=str, indent=4)
+        return {
+            'trades': "trade_json",
             'success': True
         }, 200
 

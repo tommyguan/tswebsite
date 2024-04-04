@@ -146,7 +146,11 @@ def portfolio_balance (ib, account):
     print("cash:", cash, "buying_power:", buying_power, "net_asset:", net_asset)
     return cash, buying_power, net_asset   
 
-
+def open_trades(ib):
+    
+    open_orders = ib.reqAllOpenOrders()
+    
+    return open_orders
 
 def get_beta(symbol):
     stock_contract = Stock(symbol, 'SMART', 'USD')  # Replace 'AAPL' with the desired stock symbol

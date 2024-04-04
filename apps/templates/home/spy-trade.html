@@ -60,6 +60,16 @@
     })
   }
 
+  function fetch_open_trades(){
+    fetch("/trade/open_orders")
+    .then(res => res.json())
+    .then(d => {
+      for(trade of d.trades){
+        alert(trade)
+      }
+    })
+  }
+
   function fetch_spy_portfolio(){
     //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
     fetch("/trade/portfolio_spy")
@@ -78,6 +88,7 @@
       console.log(d)
     })
   }
+  fetch_open_trades();
   fetch_spy_price();
   fetch_balance();
   fetch_spy_portfolio();
