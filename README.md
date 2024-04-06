@@ -9,7 +9,7 @@ To kill the site, ps -aef|grep python3 , sudo kill -9 PID
 
 Guan Ximing / guan
 
-TWS : ssh -i "awswebkey.pem" ubuntu@54.151.16.77 (might change after reboot)
+TWS : ssh -i "awswebkey.pem" ubuntu@52.9.87.16 (might change after reboot)
 
 Steps to config TWS server,https://dev.to/kairatorozobekov/setting-up-tws-ibc-on-ec2-instance-88b
 

@@ -8,7 +8,8 @@ from datetime import datetime
 from datetime import date
 from flask_restx import Resource, Api
 from flask_login import login_required
-from apps.api.spy import *  # Import the utils module
+import subprocess
+from ib_insync_util.spy_live import *
 from apps.api import ib
 import flask
 import finnhub
@@ -19,7 +20,7 @@ from flask_login import (
     login_user,
     logout_user
 )
-
+from ib_insync_util.global_vars import *
 from flask_dance.contrib.github import github
 
 from apps import db, login_manager
@@ -32,8 +33,9 @@ from apps.authentication.util import verify_pass, generate_token
 # Bind API -> Auth BP
 api = Api(blueprint)
 
-server='52.52.192.236'
-#server = 'localhost'
+server = '52.52.192.236'
+# server = 'localhost'
+
 
 @blueprint.route('/')
 def route_default():
@@ -96,16 +98,17 @@ def login():
         return render_template('accounts/login.html',
                                form=login_form)
 
+
 @blueprint.route('/trade/account_balance', methods=['GET', 'POST'])
-#@login_required
+# @login_required
 def account_balance():
-    if(ib is None):
+    if (ib is None):
         return {
             'message': 'Fail to connect to IB !!!',
             'success': False
         }, 500
     else:
-        cash, buying_power, net_asset = portfolio_balance(ib,'U2120530')
+        cash, buying_power, net_asset = portfolio_balance(ib, 'U2120530')
         return {
             'cash': cash,
             'buying_power': buying_power,
@@ -113,16 +116,18 @@ def account_balance():
             'success': True
         }, 200
 
+
 @blueprint.route('/trade/portfolio_spy', methods=['GET', 'POST'])
-#@login_required
+# @login_required
 def current_portfolio_spy():
-    if(ib is None):
+    if (ib is None):
         return {
             'message': 'Fail to connect to IB !!!',
             'success': False
         }, 500
     else:
-        spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy(ib,'U2120530')
+        spy_position, call_amt, put_amt, positions_to_roll = portfolio_spy(
+            ib, 'U2120530')
         return {
             'spy_position': spy_position,
             'call_amt': call_amt,
@@ -130,30 +135,38 @@ def current_portfolio_spy():
             'positions_to_roll': positions_to_roll,
             'success': True
         }, 200
-    
+
+
 @blueprint.route('/trade/open_orders', methods=['GET', 'POST'])
-#@login_required
+# @login_required
 def open_orders():
-    if(ib is None):
+    if (ib is None):
         return {
             'message': 'Fail to connect to IB !!!',
             'success': False
         }, 500
     else:
-        open_orders = open_trades(ib)
-        #trade_dicts = [util.tree(trade) for trade in open_orders]
+        p = subprocess.Popen(
+            python_path + '/Users/tguan/lib/oracle-cli/bin/python ./ib_insync_util/open_orders.py', shell=True, stdout=subprocess.PIPE,
+            universal_newlines=True)
+    cmd_return = p.communicate()[0]
+    test = cmd_return.decode('utf-8')
+    # cmd_return = cmd_return.replace('\n', '')
+    # cmd_return = cmd_return.replace(' ', '')
+    # list_from_string = cmd_return.split(',')
+    trade_dicts = [util.tree(trade) for trade in cmd_return]
 
-        # Convert trade dictionaries to JSON format
-        #trade_json = json.dumps(trade_dicts, default=str, indent=4)
-        return {
-            'trades': "trade_json",
-            'success': True
-        }, 200
+
+# Convert trade dictionaries to JSON format
+    trade_json = json.dumps(trade_dicts, default=str, indent=4)
+    result = json.loads(json.dumps(cmd_return))
+    return result, 200
+
 
 @blueprint.route('/trade/price', methods=['GET', 'POST'])
-#@login_required
+# @login_required
 def price():
-    if(ib is None):
+    if (ib is None):
         return {
             'message': 'Fail to connect to IB !!!',
             'success': False
@@ -171,20 +184,22 @@ def price():
             'strike_price': strike_price,
             'success': True
         }, 200
-    
+
+
 @blueprint.route('/spy_trade', methods=['GET', 'POST'])
-#@login_required
+# @login_required
 def spy_trade():
     return render_template('home/spy-trade.html')
 
+
 @blueprint.route('/balance', methods=['GET', 'POST'])
-#@login_required
+# @login_required
 def balance():
     edit_asset_form = EditUserAssetForm(request.form)
 
     # get current users information
     url = "https://"+server+"/api/users/"
-    #get total information
+    # get total information
     total_url = "https://"+server+"/api/users/0"
 
     headers = {}
@@ -206,21 +221,22 @@ def balance():
             files = [
 
             ]
-            
+
             response = requests.request(
                 "PUT", update_url, headers=headers, data=payload, files=files, verify=False)
-            
-        #validate total balance of each user add up is the total balance of company account
-        total = requests.request("GET", total_url, headers=headers, verify=False).json()['data']
+
+        # validate total balance of each user add up is the total balance of company account
+        total = requests.request(
+            "GET", total_url, headers=headers, verify=False).json()['data']
         gap = abs(float(total[0]['total_balance']) - balance)
-        if(gap > 10):
+        if (gap > 10):
             return 'There is problem. The balance of each user addup has a big gap with the company total balance, Please contact SUPPORT ASAP. The GAP is ' + str(gap)
 
-        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, data=payload, verify=False).json()['data'],total=total)
+        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, data=payload, verify=False).json()['data'], total=total)
 
     else:
 
-        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, verify=False).json()['data'],total=requests.request("GET", total_url, headers=headers, data=payload, verify=False).json()['data'])
+        return render_template('accounts/edit_assets.html', form=edit_asset_form, users=requests.request("GET", url, headers=headers, verify=False).json()['data'], total=requests.request("GET", total_url, headers=headers, data=payload, verify=False).json()['data'])
 
 
 @blueprint.route('/register', methods=['GET', 'POST'])

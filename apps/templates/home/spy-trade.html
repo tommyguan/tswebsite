@@ -15,19 +15,282 @@
     <h5>Cash : <span id = "cash"></span> | Buying Power : <span id = "buying_power"></span> | Net Asset : <span id = "net_asset"></span> </h5>
     <h3>SPY Portfolio</h3>
     <h5>SPY Position : <span id = "spy_position"></span> | Call Amount : <span id = "call_amt"></span> | Put Amount : <span id = "put_amt"></span> </h5>
-    <h5>Position To Roll: <span id = "position_to_roll"></span></h5>
-    <textarea id="positionsToRoll" name="positionsToRoll" rows="5" cols="60"></textarea>
+    <h3>Positions To Roll: <span id = "position_to_roll"></span></h3>
+    <table border-collapse="collapse" border="1px solid red">
+      <tr>
+        <td>
+          <div id="right_picker_div"></div>
+        </td>
+        <td>
+          <div id="LastTradeDate_picker_div"></div>
+        </td>
+        <td>
+          <div id="Strike_picker_div"></div>
+        </td>
+        <td>
+          <div id="Position_picker_div"></div>
+        </td>
+
+      </tr>
+    </table>
+
+    <table border="1px solid red" width="100%">
+      <tr>
+        <td>
+          <div id="positions_to_roll"></div>
+        </td>
+      </tr>
+    </table>
     {% include "includes/footer.html" %}
 
   </div>
 
 {% endblock content %}
 
-<!-- Specific JS goes HERE --> 
+<!-- Specific JS goes HERE -->
 {% block javascripts %}
-
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+  google.charts.load('current', { packages: ['table', 'controls'] });
+</script>
 
 <script>
+  function drawOpenOrdersChart() {
+      // Define the chart to be drawn.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Right');
+      data.addColumn('string', 'LastTradeDate');
+      data.addColumn('string', 'Strike');
+      data.addColumn('string', 'Position');
+      var rows = [];
+      fetch("/trade/open_orders")
+        .then(res => res.text())
+        .then(d => {
+          alert(d)
+          //alert(JSON.stringify(d))
+          trades = JSON.parse(d)
+          alert(trades[0])
+          alert(trade[0].Trade)
+          //alert(trades[0].Trade)
+          alert(trades[0][0])
+          alert(trades[0][0].Trade)
+          for (position_to_roll of d.positions_to_roll) {
+            var row = []
+            row[0] = position_to_roll[1].right.toString()
+            row[1] = position_to_roll[1].lastTradeDateOrContractMonth.toString()
+            row[2] = position_to_roll[1].strike.toString()
+            row[3] = position_to_roll[2].toString()
+            alert(row)
+            rows.push(row)
+          }
+          alert('rows is ' + rows)
+
+          alert('second time rows is ' + rows)
+          data.addRows(rows);
+          var options = {
+            showRowNumber: true,
+            width: '100%'
+          };
+          var cssClassNames = {
+            'headerRow': 'italic-darkblue-font large-font bold-font',
+            'oddTableRow': 'beige-background',
+            'selectedTableRow': 'red-font',
+            'headerCell': 'gold-border'
+          };
+          var tableChart = new google.visualization.ChartWrapper({
+
+            'chartType': 'Table',
+            'containerId': 'positions_to_roll',
+            'options': {
+              page: 'enable',
+              pageSize: '50',
+              allowHtml: 'true',
+              sortColumn: '2',
+              sortAscending: 'false',
+              showRowNumber: 'true',
+              width: '100%',
+              'cssClassNames': cssClassNames
+            }
+          });
+
+          var rightPicker = new google.visualization.ControlWrapper({
+            'controlType': 'CategoryFilter',
+            'containerId': 'right_picker_div',
+            'options': {
+              'filterColumnLabel': 'Right',
+              'ui': {
+                'labelStacking': 'vertical',
+                'allowTyping': false,
+                'allowMultiple': true,
+                'allowNone': true
+              }
+            }
+          });
+          var LastTradeDatePicker = new google.visualization.ControlWrapper({
+            'controlType': 'CategoryFilter',
+            'containerId': 'LastTradeDate_picker_div',
+            'options': {
+              'filterColumnLabel': 'LastTradeDate',
+              'ui': {
+                'labelStacking': 'vertical',
+                'allowTyping': false,
+                'allowMultiple': true,
+                'allowNone': true
+              }
+            }
+          });
+          var StrikePicker = new google.visualization.ControlWrapper({
+            'controlType': 'CategoryFilter',
+            'containerId': 'Strike_picker_div',
+            'options': {
+              'filterColumnLabel': 'Strike',
+              'ui': {
+                'labelStacking': 'vertical',
+                'allowTyping': false,
+                'allowMultiple': true,
+                'allowNone': true
+              }
+            }
+          });
+          var PositionPicker = new google.visualization.ControlWrapper({
+            'controlType': 'CategoryFilter',
+            'containerId': 'Position_picker_div',
+            'options': {
+              'filterColumnLabel': 'Position',
+              'ui': {
+                'labelStacking': 'vertical',
+                'allowTyping': false,
+                'allowMultiple': true,
+                'allowNone': true
+              }
+            }
+          });
+
+          // Instantiate and draw the chart.
+          var dash = new google.visualization.Dashboard(document.getElementById('dashboard'));
+
+          dash.bind([rightPicker, LastTradeDatePicker, StrikePicker, PositionPicker], [tableChart]);
+          dash.draw(data);
+
+          var chart = new google.visualization.Table(document.getElementById('positions_to_roll'));
+          chart.draw(data, options);
+        })
+      }
+  function drawPositionsToRollChart() {
+      // Define the chart to be drawn.
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'Right');
+      data.addColumn('string', 'LastTradeDate');
+      data.addColumn('string', 'Strike');
+      data.addColumn('string', 'Position');
+      var rows = [];
+      fetch("/trade/portfolio_spy")
+      .then(res => res.json())
+      .then(d => {
+        for (position_to_roll of d.positions_to_roll) {
+          var row = []
+          row[0] = position_to_roll[1].right.toString()
+          row[1] = position_to_roll[1].lastTradeDateOrContractMonth.toString()
+          row[2] = position_to_roll[1].strike.toString()
+          row[3] = position_to_roll[2].toString()
+          alert(row)
+          rows.push(row)
+        }
+        alert('rows is ' + rows)
+
+        alert('second time rows is ' + rows)
+        data.addRows(rows);
+        var options = {
+          showRowNumber: true,
+          width: '100%'
+        };
+        var cssClassNames = {
+          'headerRow': 'italic-darkblue-font large-font bold-font',
+          'oddTableRow': 'beige-background',
+          'selectedTableRow': 'red-font',
+          'headerCell': 'gold-border'
+        };
+        var tableChart = new google.visualization.ChartWrapper({
+
+          'chartType': 'Table',
+          'containerId': 'positions_to_roll',
+          'options': {
+            page: 'enable',
+            pageSize: '50',
+            allowHtml: 'true',
+            sortColumn: '2',
+            sortAscending: 'false',
+            showRowNumber: 'true',
+            width: '100%',
+            'cssClassNames': cssClassNames
+          }
+        });
+
+        var rightPicker = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'right_picker_div',
+          'options': {
+            'filterColumnLabel': 'Right',
+            'ui': {
+              'labelStacking': 'vertical',
+              'allowTyping': false,
+              'allowMultiple': true,
+              'allowNone': true
+            }
+          }
+        });
+        var LastTradeDatePicker = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'LastTradeDate_picker_div',
+          'options': {
+            'filterColumnLabel': 'LastTradeDate',
+            'ui': {
+              'labelStacking': 'vertical',
+              'allowTyping': false,
+              'allowMultiple': true,
+              'allowNone': true
+            }
+          }
+        });
+        var StrikePicker = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'Strike_picker_div',
+          'options': {
+            'filterColumnLabel': 'Strike',
+            'ui': {
+              'labelStacking': 'vertical',
+              'allowTyping': false,
+              'allowMultiple': true,
+              'allowNone': true
+            }
+          }
+        });
+        var PositionPicker = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'Position_picker_div',
+          'options': {
+            'filterColumnLabel': 'Position',
+            'ui': {
+              'labelStacking': 'vertical',
+              'allowTyping': false,
+              'allowMultiple': true,
+              'allowNone': true
+            }
+          }
+        });
+
+        // Instantiate and draw the chart.
+        var dash = new google.visualization.Dashboard(document.getElementById('dashboard'));
+
+        dash.bind([rightPicker, LastTradeDatePicker, StrikePicker, PositionPicker], [tableChart]);
+        dash.draw(data);
+
+        var chart = new google.visualization.Table(document.getElementById('positions_to_roll'));
+        chart.draw(data, options);
+      })
+
+    }
+
   function fetch_data(){
     fetch("https://jsonplaceholder.typicode.com/todos/1")
     .then(res => res.json())
@@ -38,7 +301,7 @@
   }
 
   function fetch_spy_price(){
-    //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
+    //to bypass the cert error, need open a new tab, and access the below url, and access the risk.
     fetch("/trade/price")
     .then(res => res.json())
     .then(d => {
@@ -49,7 +312,7 @@
   }
 
   function fetch_balance(){
-    //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
+    //to bypass the cert error, need open a new tab, and access the below url, and access the risk.
     fetch("/trade/account_balance")
     .then(res => res.json())
     .then(d => {
@@ -71,7 +334,7 @@
   }
 
   function fetch_spy_portfolio(){
-    //to bypass the cert error, need open a new tab, and access the below url, and access the risk. 
+    //to bypass the cert error, need open a new tab, and access the below url, and access the risk.
     fetch("/trade/portfolio_spy")
     .then(res => res.json())
     .then(d => {
@@ -88,10 +351,10 @@
       console.log(d)
     })
   }
-  fetch_open_trades();
-  fetch_spy_price();
-  fetch_balance();
-  fetch_spy_portfolio();
+  //fetch_open_trades();
+  //fetch_spy_price();
+  //fetch_balance();
+  //fetch_spy_portfolio();
 /*
 setInterval(function(){
   fetch_spy_price();
@@ -99,6 +362,8 @@ setInterval(function(){
   fetch_spy_portfolio();
 },1000)
     */
+   google.charts.setOnLoadCallback(drawOpenOrdersChart);
+   //google.charts.setOnLoadCallback(drawPositionsToRollChart);
   </script>
 
 
