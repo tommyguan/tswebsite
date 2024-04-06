@@ -10,14 +10,18 @@ ib.connect(tws_ip, 7497, clientId=8, timeout=300)
 # Request open orders
 open_orders = ib.reqAllOpenOrders()
 # for order in open_orders:
+order1 = '{\"key\":\"value\"}'
+order2 = '{\"key\":\"value\"}'
+print(order1 + '\n' + order2)
+orders = ''
+order_no = 0
 for order in open_orders:
-    print('{conId:'+order.contract.conId+'}')
+    order_no = order_no + 1
+    order = '{\"conId\":\"{}\",\"key\":\"{}\"}'.format(order.contract.conId,order.contract.conId)
+    if order_no > 1:
+        order = '\n' + order
+    orders = orders + order
 
-# trade_dicts = [util.tree(trade) for trade in open_orders]
-
-# Convert trade dictionaries to JSON format
-# trade_json = json.dumps(trade_dicts, default=str, indent=4)
-
-# Print or save the JSON string
-# print(open_orders)
 ib.disconnect()
+print(orders)
+
