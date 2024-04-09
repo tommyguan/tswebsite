@@ -5,7 +5,7 @@ from ib_insync_util.global_vars import python_path
 
 def run_python_file(filename):
     process = subprocess.Popen(
-        python_path + filename, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        python_path+ " " + filename, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     output, error = process.communicate()
 
     # Convert output to JSON array

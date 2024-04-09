@@ -136,7 +136,7 @@ def current_portfolio_spy():
             'success': True
         }, 200
 
-
+from ib_insync_util.util import run_python_file
 @blueprint.route('/trade/open_orders', methods=['GET', 'POST'])
 # @login_required
 def open_orders():
@@ -146,22 +146,8 @@ def open_orders():
             'success': False
         }, 500
     else:
-        p = subprocess.Popen(
-            python_path + '/Users/tguan/lib/oracle-cli/bin/python ./ib_insync_util/open_orders.py', shell=True, stdout=subprocess.PIPE,
-            universal_newlines=True)
-    cmd_return = p.communicate()[0]
-    test = cmd_return.decode('utf-8')
-    # cmd_return = cmd_return.replace('\n', '')
-    # cmd_return = cmd_return.replace(' ', '')
-    # list_from_string = cmd_return.split(',')
-    trade_dicts = [util.tree(trade) for trade in cmd_return]
-
-
-# Convert trade dictionaries to JSON format
-    trade_json = json.dumps(trade_dicts, default=str, indent=4)
-    result = json.loads(json.dumps(cmd_return))
-    return result, 200
-
+        open_orders_array = run_python_file("ib_insync_util//open_orders.py")
+        return json.dumps(open_orders_array)
 
 @blueprint.route('/trade/price', methods=['GET', 'POST'])
 # @login_required

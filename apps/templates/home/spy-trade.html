@@ -41,6 +41,33 @@
         </td>
       </tr>
     </table>
+
+    <h3>Open Orders:<span id = "open_orders"></span></h3>
+    <table border-collapse="collapse" border="1px solid red">
+      <tr>
+        <td>
+          <div id="order_ight_picker_div"></div>
+        </td>
+        <td>
+          <div id="action_picker_div"></div>
+        </td>
+        <td>
+          <div id="status_picker_div"></div>
+        </td>
+        <td>
+          <div id="orderType_picker_div"></div>
+        </td>
+
+      </tr>
+    </table>
+
+    <table border="1px solid red" width="100%">
+      <tr>
+        <td>
+          <div id="open_orders"></div>
+        </td>
+      </tr>
+    </table>
     {% include "includes/footer.html" %}
 
   </div>
@@ -58,49 +85,56 @@
   function drawOpenOrdersChart() {
       // Define the chart to be drawn.
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'Right');
-      data.addColumn('string', 'LastTradeDate');
-      data.addColumn('string', 'Strike');
-      data.addColumn('string', 'Position');
+      data.addColumn('string', 'conId');
+      data.addColumn('string', 'time');
+      data.addColumn('string', 'right');
+      data.addColumn('string', 'action');
+      data.addColumn('string', 'totalQuantity');
+      data.addColumn('string', 'orderType');
+      data.addColumn('string', 'lmtPrice');
+      data.addColumn('string', 'status');
+      data.addColumn('string', 'filled');
+      data.addColumn('string', 'remaining');
+      data.addColumn('string', 'avgFillPrice');
+      data.addColumn('string', 'account');
       var rows = [];
       fetch("/trade/open_orders")
-        .then(res => res.text())
-        .then(d => {
-          alert(d)
-          //alert(JSON.stringify(d))
-          trades = JSON.parse(d)
-          alert(trades[0])
-          alert(trade[0].Trade)
-          //alert(trades[0].Trade)
-          alert(trades[0][0])
-          alert(trades[0][0].Trade)
-          for (position_to_roll of d.positions_to_roll) {
+        .then(res => res.json())
+        .then(d => {        
+          // Iterate over each object in the array and display its content
+          d.forEach(obj => {
             var row = []
-            row[0] = position_to_roll[1].right.toString()
-            row[1] = position_to_roll[1].lastTradeDateOrContractMonth.toString()
-            row[2] = position_to_roll[1].strike.toString()
-            row[3] = position_to_roll[2].toString()
-            alert(row)
-            rows.push(row)
-          }
-          alert('rows is ' + rows)
+            row[0] = obj.conId.toString()
+            row[1] = obj.time.toString()
+            row[2] = obj.right.toString()
+            row[3] = obj.action.toString()
+            row[4] = obj.totalQuantity.toString()
+            row[5] = obj.orderType.toString()
+            row[6] = obj.lmtPrice.toString()
+            row[7] = obj.status.toString()
+            row[8] = obj.filled.toString()
+            row[9] = obj.remaining.toString()
+            row[10] = obj.avgFillPrice.toString()
+            row[11] = obj.account.toString()
 
-          alert('second time rows is ' + rows)
+            rows.push(row)
+          });
+
           data.addRows(rows);
-          var options = {
+          var options1 = {
             showRowNumber: true,
             width: '100%'
           };
-          var cssClassNames = {
+          var cssClassNames1 = {
             'headerRow': 'italic-darkblue-font large-font bold-font',
             'oddTableRow': 'beige-background',
             'selectedTableRow': 'red-font',
             'headerCell': 'gold-border'
           };
-          var tableChart = new google.visualization.ChartWrapper({
+          var tableChart1 = new google.visualization.ChartWrapper({
 
             'chartType': 'Table',
-            'containerId': 'positions_to_roll',
+            'containerId': 'open_orders',
             'options': {
               page: 'enable',
               pageSize: '50',
@@ -109,15 +143,15 @@
               sortAscending: 'false',
               showRowNumber: 'true',
               width: '100%',
-              'cssClassNames': cssClassNames
+              'cssClassNames': cssClassNames1
             }
           });
 
           var rightPicker = new google.visualization.ControlWrapper({
             'controlType': 'CategoryFilter',
-            'containerId': 'right_picker_div',
+            'containerId': 'order_right_picker_div',
             'options': {
-              'filterColumnLabel': 'Right',
+              'filterColumnLabel': 'right',
               'ui': {
                 'labelStacking': 'vertical',
                 'allowTyping': false,
@@ -167,13 +201,13 @@
           });
 
           // Instantiate and draw the chart.
-          var dash = new google.visualization.Dashboard(document.getElementById('dashboard'));
+          var dash = new google.visualization.Dashboard(document.getElementById('dashboard_open_orders'));
 
-          dash.bind([rightPicker, LastTradeDatePicker, StrikePicker, PositionPicker], [tableChart]);
+          dash.bind([], [tableChart1]);
           dash.draw(data);
 
-          var chart = new google.visualization.Table(document.getElementById('positions_to_roll'));
-          chart.draw(data, options);
+          var chart = new google.visualization.Table(document.getElementById('open_orders'));
+          chart.draw(data, options1);
         })
       }
   function drawPositionsToRollChart() {
@@ -196,9 +230,6 @@
           alert(row)
           rows.push(row)
         }
-        alert('rows is ' + rows)
-
-        alert('second time rows is ' + rows)
         data.addRows(rows);
         var options = {
           showRowNumber: true,
@@ -351,10 +382,10 @@
       console.log(d)
     })
   }
-  //fetch_open_trades();
-  //fetch_spy_price();
-  //fetch_balance();
-  //fetch_spy_portfolio();
+  fetch_open_trades();
+  fetch_spy_price();
+  fetch_balance();
+  fetch_spy_portfolio();
 /*
 setInterval(function(){
   fetch_spy_price();
@@ -362,8 +393,9 @@ setInterval(function(){
   fetch_spy_portfolio();
 },1000)
     */
+   
+   google.charts.setOnLoadCallback(drawPositionsToRollChart);
    google.charts.setOnLoadCallback(drawOpenOrdersChart);
-   //google.charts.setOnLoadCallback(drawPositionsToRollChart);
   </script>
 
 
