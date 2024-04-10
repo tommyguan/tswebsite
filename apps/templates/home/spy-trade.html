@@ -7,6 +7,18 @@
 
 {% block content %}
 
+<style>
+  table {
+    border-collapse: collapse;
+    font-size: 10px;
+  }
+
+  th, td {
+    border: 0.5px dotted rgb(171, 220, 237);
+    padding: 1px 1px;
+  }
+</style>
+
     <div class="container-fluid py-4">
     <div class="alert alert-warning" role="alert">
       <h4>SPY Price : <span id = "spy_price"></span> | SPY Strike Price : <span id = "spy_srike_price"></span></h4>
@@ -15,59 +27,71 @@
     <h5>Cash : <span id = "cash"></span> | Buying Power : <span id = "buying_power"></span> | Net Asset : <span id = "net_asset"></span> </h5>
     <h3>SPY Portfolio</h3>
     <h5>SPY Position : <span id = "spy_position"></span> | Call Amount : <span id = "call_amt"></span> | Put Amount : <span id = "put_amt"></span> </h5>
-    <h3>Positions To Roll: <span id = "position_to_roll"></span></h3>
-    <table border-collapse="collapse" border="1px solid red">
+    <h3>Positions To Roll: </h3>
+    <table>
       <tr>
         <td>
-          <div id="right_picker_div"></div>
+          <button class="btn mb-2 me-2 btn-outline-primary" type="button"><i class="far fa-heart me-2"></i>Close</button>
         </td>
         <td>
-          <div id="LastTradeDate_picker_div"></div>
+          <button class="btn mb-2 me-2 btn-outline-primary" type="button"><i class="far fa-heart me-2"></i>Duplicate</button>
         </td>
         <td>
-          <div id="Strike_picker_div"></div>
-        </td>
-        <td>
-          <div id="Position_picker_div"></div>
-        </td>
-
-      </tr>
-    </table>
-
-    <table border="1px solid red" width="100%">
-      <tr>
-        <td>
-          <div id="positions_to_roll"></div>
+          <button class="btn mb-2 me-2 btn-outline-primary" type="button"><i class="far fa-heart me-2"></i>Roll</button>
         </td>
       </tr>
     </table>
-
-    <h3>Open Orders:<span id = "open_orders"></span></h3>
-    <table border-collapse="collapse" border="1px solid red">
+    <table>
       <tr>
         <td>
-          <div id="order_ight_picker_div"></div>
+          <h6 id="right_picker_div"></h6>
         </td>
         <td>
-          <div id="action_picker_div"></div>
+          <h6 id="LastTradeDate_picker_div"></h6>
         </td>
         <td>
-          <div id="status_picker_div"></div>
+          <h6 id="Strike_picker_div"></h6>
         </td>
         <td>
-          <div id="orderType_picker_div"></div>
-        </td>
-
-      </tr>
-    </table>
-
-    <table border="1px solid red" width="100%">
-      <tr>
-        <td>
-          <div id="open_orders"></div>
+          <h6 id="Position_picker_div"></h6>
         </td>
       </tr>
     </table>
+    
+    <span id = "positions_to_roll"></span>
+
+    
+
+    <h3>Open Orders:</h3>
+    <table>
+      <tr>
+        <td>
+          <button class="btn mb-2 me-2 btn-outline-primary" type="button"><i class="far fa-heart me-2"></i>New Order</button>
+        </td>
+        <td>
+          <button class="btn mb-2 me-2 btn-outline-primary" type="button"><i class="far fa-heart me-2"></i>Cancel Order</button>
+        </td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <td>
+          <h6 id="order_right_picker_div"></h6>
+        </td>
+        <td>
+          <h6 id="action_picker_div"></h6>
+        </td>
+        <td>
+          <h6 id="status_picker_div"></h6>
+        </td>
+        <td>
+          <h6 id="orderType_picker_div"></h6>
+        </td>
+      </tr>
+    </table>
+
+    <span id = "open_orders"></span>
+
     {% include "includes/footer.html" %}
 
   </div>
@@ -85,18 +109,18 @@
   function drawOpenOrdersChart() {
       // Define the chart to be drawn.
       var data = new google.visualization.DataTable();
-      data.addColumn('string', 'conId');
-      data.addColumn('string', 'time');
-      data.addColumn('string', 'right');
-      data.addColumn('string', 'action');
-      data.addColumn('string', 'totalQuantity');
-      data.addColumn('string', 'orderType');
-      data.addColumn('string', 'lmtPrice');
-      data.addColumn('string', 'status');
-      data.addColumn('string', 'filled');
-      data.addColumn('string', 'remaining');
-      data.addColumn('string', 'avgFillPrice');
-      data.addColumn('string', 'account');
+      data.addColumn('string', 'ConId');
+      data.addColumn('string', 'Time');
+      data.addColumn('string', 'Right');
+      data.addColumn('string', 'Action');
+      data.addColumn('string', 'TotalQuantity');
+      data.addColumn('string', 'OrderType');
+      data.addColumn('string', 'LmtPrice');
+      data.addColumn('string', 'Status');
+      data.addColumn('string', 'Filled');
+      data.addColumn('string', 'Remaining');
+      data.addColumn('string', 'AvgFillPrice');
+      data.addColumn('string', 'Account');
       var rows = [];
       fetch("/trade/open_orders")
         .then(res => res.json())
@@ -125,12 +149,7 @@
             showRowNumber: true,
             width: '100%'
           };
-          var cssClassNames1 = {
-            'headerRow': 'italic-darkblue-font large-font bold-font',
-            'oddTableRow': 'beige-background',
-            'selectedTableRow': 'red-font',
-            'headerCell': 'gold-border'
-          };
+          
           var tableChart1 = new google.visualization.ChartWrapper({
 
             'chartType': 'Table',
@@ -142,8 +161,7 @@
               sortColumn: '2',
               sortAscending: 'false',
               showRowNumber: 'true',
-              width: '100%',
-              'cssClassNames': cssClassNames1
+              width: '100%'
             }
           });
 
@@ -151,7 +169,29 @@
             'controlType': 'CategoryFilter',
             'containerId': 'order_right_picker_div',
             'options': {
-              'filterColumnLabel': 'right',
+              'filterColumnLabel': 'Right',
+              'ui': {
+                'labelStacking': 'horizontal',
+                'allowTyping': false,
+                'allowMultiple': true,
+                'allowNone': true,
+                'labelFontSize': 10, // Adjust font size
+                'labelFontStyle': 'normal', // Adjust font style
+                'labelColor': 'black', // Adjust font color
+                'labelBackground': 'none', // Remove label background
+                'labelPadding': 2, // Adjust label padding
+                'labelSeparator': '', // Remove label separator
+                'labelBorderWidth': 0, // Remove label border
+                'labelFontName': 'Arial, sans-serif', // Adjust font family
+                'selectedValuesLayout': 'belowWrapping' // Adjust layout
+              }
+            }
+          });
+          var actionPicker = new google.visualization.ControlWrapper({
+            'controlType': 'CategoryFilter',
+            'containerId': 'action_picker_div',
+            'options': {
+              'filterColumnLabel': 'Action',
               'ui': {
                 'labelStacking': 'vertical',
                 'allowTyping': false,
@@ -160,11 +200,11 @@
               }
             }
           });
-          var LastTradeDatePicker = new google.visualization.ControlWrapper({
+          var statusPicker = new google.visualization.ControlWrapper({
             'controlType': 'CategoryFilter',
-            'containerId': 'LastTradeDate_picker_div',
+            'containerId': 'status_picker_div',
             'options': {
-              'filterColumnLabel': 'LastTradeDate',
+              'filterColumnLabel': 'Status',
               'ui': {
                 'labelStacking': 'vertical',
                 'allowTyping': false,
@@ -173,29 +213,17 @@
               }
             }
           });
-          var StrikePicker = new google.visualization.ControlWrapper({
+          var orderTypePicker = new google.visualization.ControlWrapper({
             'controlType': 'CategoryFilter',
-            'containerId': 'Strike_picker_div',
+            'containerId': 'orderType_picker_div',
             'options': {
-              'filterColumnLabel': 'Strike',
+              'filterColumnLabel': 'OrderType',
               'ui': {
                 'labelStacking': 'vertical',
                 'allowTyping': false,
                 'allowMultiple': true,
-                'allowNone': true
-              }
-            }
-          });
-          var PositionPicker = new google.visualization.ControlWrapper({
-            'controlType': 'CategoryFilter',
-            'containerId': 'Position_picker_div',
-            'options': {
-              'filterColumnLabel': 'Position',
-              'ui': {
-                'labelStacking': 'vertical',
-                'allowTyping': false,
-                'allowMultiple': true,
-                'allowNone': true
+                'allowNone': true,
+                'lable': 'Position'
               }
             }
           });
@@ -203,7 +231,7 @@
           // Instantiate and draw the chart.
           var dash = new google.visualization.Dashboard(document.getElementById('dashboard_open_orders'));
 
-          dash.bind([], [tableChart1]);
+          dash.bind([rightPicker,actionPicker,orderTypePicker,statusPicker], [tableChart1]);
           dash.draw(data);
 
           var chart = new google.visualization.Table(document.getElementById('open_orders'));
@@ -227,7 +255,6 @@
           row[1] = position_to_roll[1].lastTradeDateOrContractMonth.toString()
           row[2] = position_to_roll[1].strike.toString()
           row[3] = position_to_roll[2].toString()
-          alert(row)
           rows.push(row)
         }
         data.addRows(rows);
@@ -235,14 +262,8 @@
           showRowNumber: true,
           width: '100%'
         };
-        var cssClassNames = {
-          'headerRow': 'italic-darkblue-font large-font bold-font',
-          'oddTableRow': 'beige-background',
-          'selectedTableRow': 'red-font',
-          'headerCell': 'gold-border'
-        };
-        var tableChart = new google.visualization.ChartWrapper({
 
+        var tableChart = new google.visualization.ChartWrapper({
           'chartType': 'Table',
           'containerId': 'positions_to_roll',
           'options': {
@@ -252,8 +273,8 @@
             sortColumn: '2',
             sortAscending: 'false',
             showRowNumber: 'true',
-            width: '100%',
-            'cssClassNames': cssClassNames
+            width: '100%'
+            //'cssClassNames': cssClassNames
           }
         });
 
@@ -354,16 +375,6 @@
     })
   }
 
-  function fetch_open_trades(){
-    fetch("/trade/open_orders")
-    .then(res => res.json())
-    .then(d => {
-      for(trade of d.trades){
-        alert(trade)
-      }
-    })
-  }
-
   function fetch_spy_portfolio(){
     //to bypass the cert error, need open a new tab, and access the below url, and access the risk.
     fetch("/trade/portfolio_spy")
@@ -382,10 +393,10 @@
       console.log(d)
     })
   }
-  fetch_open_trades();
-  fetch_spy_price();
-  fetch_balance();
-  fetch_spy_portfolio();
+  //fetch_open_trades();
+  //fetch_spy_price();
+  //fetch_balance();
+  //fetch_spy_portfolio();
 /*
 setInterval(function(){
   fetch_spy_price();
